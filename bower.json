@@ -3,7 +3,9 @@
   "description": "Element for listing local options in a grid",
   "main": "oc-library-option-sets-list.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0"
+    "polymer": "Polymer/polymer#^1.4.0",
+    "oc-option-sets-list": "git://github.com/oc-elements/oc-option-sets-list#1.x",
+    "oc-product-library-api": "git://github.com/oc-elements/oc-product-library-api#1.x"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

@@ -1,10 +1,13 @@
 <link rel="import" href="../polymer/polymer.html">
 
+<link rel="import" href="../oc-option-sets-list/oc-option-sets-list.html">
+<link rel="import" href="../oc-product-library-api/oc-product-library-api.html">
+
 <!--
 `oc-library-option-sets-list`
 Element for listing local options in a grid
 
-@demo demo/index.html 
+@demo demo/index.html
 -->
 
 <dom-module id="oc-library-option-sets-list">
@@ -14,7 +17,16 @@ Element for listing local options in a grid
         display: block;
       }
     </style>
-    <h2>Hello [[prop1]]</h2>
+
+    <oc-product-library-api id="optionsApi" ></oc-product-library-api>
+    <oc-option-sets-list
+            items="[[ _items ]]"
+            total-items="[[ _totalItems ]]"
+            page-size="[[ _pageSize ]]"
+            current-page="[[ _currentPage ]]"
+            on-async-page-request="_onPageRequest"
+    ></oc-option-sets-list>
+
   </template>
 
   <script>
@@ -23,11 +35,38 @@ Element for listing local options in a grid
       is: 'oc-library-option-sets-list',
 
       properties: {
-        prop1: {
-          type: String,
-          value: 'oc-library-option-sets-list',
-        },
+        organisationId: Number,
+        loading: {
+          type: Boolean,
+          value: false,
+          notify: true
+        }
       },
+
+      observers: [
+        'refresh(organisationId)'
+      ],
+
+      refresh: function() {
+        this.loading = true;
+        this._getOptionSets(1, 10);
+      },
+
+      _onPageRequest: function(event) {
+        this._getOptionSets(event.detail.page, event.detail.range);
+      },
+
+      _getOptionSets : function(page, pageSize){
+        this.$.optionsApi.getProductOptionSets(page, pageSize)
+                .then(function(request) {
+                  this._items = request.response.results;
+                  this._totalItems = request.response.count;
+                  this._currentPage = page;
+                  this._pageSize = pageSize;
+                }.bind(this))
+                .catch(this.fire.bind(this, 'option-set-error', 'Failed to load option sets'))
+                .finally(this.set.bind(this, 'loading', false));
+      }
 
     });
   </script>
